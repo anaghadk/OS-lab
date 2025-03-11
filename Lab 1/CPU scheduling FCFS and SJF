@@ -1,0 +1,78 @@
+#include<stdio.h>
+#include<conio.h>
+void main(){
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d",&n);
+    int p[n], wt[n], bt[n], tat[n];
+    float wtavg, tatavg;
+    for(int i=0; i<n; i++){
+        p[i]=i+1;
+    }
+    for(int i=0; i<n; i++){
+        printf("Enter the burst time for process %d: \n",i+1);
+        scanf("%d",&bt[i]);
+    }
+    wt[0]=0;
+    wtavg=0.0;
+    tat[0]=bt[0];
+    tatavg=bt[0];
+    for(int i=1; i<n; i++){
+        wt[i]=wt[i-1]+bt[i-1];
+        tat[i]=tat[i-1]+bt[i];
+        wtavg+=wt[i];
+        tatavg+=tat[i];
+    }
+    tatavg=tatavg/n;
+    wtavg=wtavg/n;
+    for(int i=0;i<n;i++){
+        printf(" Process: %d\t Burst Time: %d\t Turn Around Time: %d\t Waiting Time: %d\t\n",p[i],bt[i],tat[i],wt[i]);
+    }
+    printf("Average Turn Around time: %f, Average Waiting time: %f",tatavg,wtavg);
+}
+
+#include<stdio.h>
+#include<conio.h>
+void main(){
+    int n,temp,temp2;
+    printf("Enter the number of processes: ");
+    scanf("%d",&n);
+    int p[n], wt[n], bt[n], tat[n];
+    float wtavg, tatavg;
+    for(int i=0; i<n; i++){
+        p[i]=i+1;
+    }
+    for(int i=0; i<n; i++){
+        printf("Enter the burst time for process\n",i+1);
+        scanf("%d",&bt[i]);
+    }
+    for(int i=0;i<n;i++){
+        for(int j=i+1;j<n;j++){
+            if(bt[i]>bt[j]){
+                temp=bt[i];
+                bt[i]=bt[j];
+                bt[j]=temp;
+                temp2=p[i];
+                p[i]=p[j];
+                p[j]=temp2;
+            }
+        }
+    }
+    wt[0]=0;
+    wtavg=0.0;
+    tat[0]=bt[0];
+    tatavg=bt[0];
+    for(int i=1; i<n; i++){
+        wt[i]=wt[i-1]+bt[i-1];
+        tat[i]=tat[i-1]+bt[i];
+        wtavg+=wt[i];
+        tatavg+=tat[i];
+    }
+    tatavg=tatavg/n;
+    wtavg=wtavg/n;
+    for(int i=0;i<n;i++){
+        printf(" Process: %d\t Burst Time: %d\t Turn Around Time: %d\t Waiting Time: %d\t\n",p[i],bt[i],tat[i],wt[i]);
+    }
+    printf("Average Turn Around time: %f\n Average Waiting time: %f",tatavg,wtavg);
+}
+
