@@ -1,0 +1,74 @@
+#include <stdio.h>
+
+typedef struct multi {
+    int process, bt, tat, wt;
+};
+
+void main() {
+    int m, n;
+    float wtavg1, tatavg1, wtavg2, tatavg2;
+    printf("Enter the number of system processes: ");
+    scanf("%d", &m);
+    struct multi q1[m];
+    printf("Enter the number of user processes: ");
+    scanf("%d", &n);
+    struct multi q2[n];
+
+
+    printf("Enter the System process no. and Burst times: ");
+    for (int i = 0; i < m; i++) {
+        scanf("%d %d", &q1[i].process, &q1[i].bt);
+    }
+
+
+    printf("Enter the User process no. and Burst times: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d %d", &q2[i].process, &q2[i].bt);
+    }
+
+
+    q1[0].wt = 0;
+    wtavg1 = 0.0;
+    q1[0].tat = q1[0].bt;
+    tatavg1 = q1[0].bt;
+    for (int i = 1; i < m; i++) {
+        q1[i].wt = q1[i - 1].wt + q1[i - 1].bt;
+        q1[i].tat = q1[i - 1].tat + q1[i].bt;
+        wtavg1 += q1[i].wt;
+        tatavg1 += q1[i].tat;
+    }
+    wtavg1 = wtavg1 / m;
+    tatavg1 = tatavg1 / m;
+
+    q2[0].tat = q1[m - 1].tat + q2[0].bt;
+    q2[0].wt = q2[0].tat - q2[0].bt;
+    wtavg2 = 0.0;
+    tatavg2 = q2[0].bt;
+    wtavg2 += q2[0].wt;
+
+    for (int i = 1; i < n; i++) {
+        q2[i].wt = q2[i - 1].wt + q2[i - 1].bt;
+        q2[i].tat = q2[i - 1].tat + q2[i].bt;
+        wtavg2 += q2[i].wt;
+        tatavg2 += q2[i].tat;
+    }
+    wtavg2 = wtavg2 / n;
+    tatavg2 = tatavg2 / n;
+
+
+    float overallTatAvg = (tatavg1 * m + tatavg2 * n) / (m + n);
+    float overallWtAvg = (wtavg1 * m + wtavg2 * n) / (m + n);
+
+
+    for (int i = 0; i < m; i++) {
+        printf("System Process: %d\t Burst Time: %d\t Turn Around Time: %d\t Waiting Time: %d\n", q1[i].process, q1[i].bt, q1[i].tat, q1[i].wt);
+    }
+
+    for (int i = 0; i < n; i++) {
+        printf("User Process: %d\t Burst Time: %d\t Turn Around Time: %d\t Waiting Time: %d\n", q2[i].process, q2[i].bt, q2[i].tat, q2[i].wt);
+    }
+
+    printf("Average Turn Around time: %.2f, Average Waiting time: %.2f\n", overallTatAvg, overallWtAvg);
+}
+
+
