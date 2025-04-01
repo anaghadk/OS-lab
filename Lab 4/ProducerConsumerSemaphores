@@ -1,0 +1,68 @@
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
+
+#define BUFFER 5
+int mutex = 1, full = 0, empty = BUFFER, x = 0;
+
+void wait(int *s) {
+    while (*s <= 0);
+    --(*s);
+}
+
+void signal(int *s) {
+    ++(*s);
+}
+
+void producer() {
+    wait(&mutex);
+    if (empty > 0) {
+        --empty;
+        ++full;
+        x++;
+        printf("Producer has produced: Item %d\n", x);
+    } else {
+        printf("Buffer is Full\n");
+    }
+    signal(&mutex);
+}
+
+void consumer() {
+    wait(&mutex);
+    if (full > 0) {
+        --full;
+        ++empty;
+        printf("Consumer has consumed: Item %d\n", x);
+        x--;
+    } else {
+        printf("Buffer is Empty\n");
+    }
+    signal(&mutex);
+}
+
+void main() {
+    int no;
+    while (1) {
+        printf("Enter \n 1:Producer\n 2:Consumer\n 3:Exit\n");
+        scanf("%d", &no);
+        switch (no) {
+            case 1:
+                producer();
+                break;
+            case 2:
+                if (full == 0) {
+                    printf("Buffer is Empty\n");
+                } else {
+                    consumer();
+                }
+                break;
+            case 3:
+                exit(0);
+                break;
+            default:
+                printf("Invalid input\n");
+                break;
+        }
+    }
+}
+
