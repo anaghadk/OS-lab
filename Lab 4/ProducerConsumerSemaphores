@@ -15,29 +15,38 @@ void signal(int *s) {
 }
 
 void producer() {
-    wait(&mutex);
+
     if (empty > 0) {
-        --empty;
-        ++full;
+        wait(&empty);
+        wait(&mutex);
+
+
         x++;
         printf("Producer has produced: Item %d\n", x);
+        signal(&mutex);
+        signal(&full);
     } else {
         printf("Buffer is Full\n");
     }
-    signal(&mutex);
+
 }
 
 void consumer() {
-    wait(&mutex);
+
     if (full > 0) {
-        --full;
-        ++empty;
+        wait(&full);
+        wait(&mutex);
+
+
         printf("Consumer has consumed: Item %d\n", x);
         x--;
+        signal(&mutex);
+        signal(&empty);
+
     } else {
         printf("Buffer is Empty\n");
     }
-    signal(&mutex);
+
 }
 
 void main() {
@@ -65,4 +74,3 @@ void main() {
         }
     }
 }
-
