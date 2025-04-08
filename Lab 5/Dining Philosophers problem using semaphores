@@ -1,0 +1,75 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int mutex = 1;
+
+void wait(int *s) {
+    while (*s <= 0);
+    --(*s);
+}
+
+void signal(int *s) {
+    ++(*s);
+}
+
+int main() {
+    int n, h, ch;
+    printf("Enter the total number of philosophers: ");
+    scanf("%d", &n);
+    printf("How many are hungry? ");
+    scanf("%d", &h);
+    int a[h];
+    for (int i = 0; i < h; i++) {
+        printf("Enter philosopher %d position (1 to %d): ", i + 1, n);
+        scanf("%d", &a[i]);
+    }
+
+    while (1) {
+        printf("\n1. One can eat at a time\n2. Two can eat at a time\n3. Exit\nEnter your choice: ");
+        scanf("%d", &ch);
+        switch (ch) {
+            case 1:
+                printf("Allow one philosopher to eat at any time\n");
+                for(int j=0;j<h;j++){
+                for(int i=0;i<h;i++){
+                    printf("P %d is waiting\n",a[i]);
+
+            }
+            wait(&mutex);
+            printf("P %d is granted to eat\n",a[j]);
+            printf("P %d has finished eating\n",a[j]);
+            signal(&mutex);
+            }
+                break;
+
+            case 2:
+                printf("Allow two philosophers to eat at any time\n");
+                
+
+                for (int i = 0; i < h; i++) {
+                    printf("P %d is waiting\n", a[i]);
+                }
+                for (int j = 0; j < h - 1; j += 2) {
+                    wait(&mutex);
+                    printf("P %d is granted to eat\n", a[j]);
+                    printf("P %d is granted to eat\n", a[j + 1]);
+                    printf("P %d has finished eating\n", a[j]);
+                    printf("P %d has finished eating\n", a[j + 1]);
+                    signal(&mutex);
+                }
+                if (h % 2 != 0) {
+                    wait(&mutex);
+                    printf("P %d is granted to eat\n", a[h - 1]);
+                    printf("P %d has finished eating\n", a[h - 1]);
+                    signal(&mutex);
+                }
+                break;
+
+            case 3:
+                exit(0);
+        }
+    }
+
+    return 0;
+}
