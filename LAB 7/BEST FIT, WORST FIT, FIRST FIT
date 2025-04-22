@@ -1,0 +1,215 @@
+/*#include<stdio.h>
+#include<conio.h>
+
+int max(int mem[m]){
+int maxi=mem[0];
+for(int i=1;i<m;i++){
+    if(mem[i]>maxi){
+        maxi=mem[i];
+    }
+}
+return maxi;
+}
+void main(){
+int n,m,flag=0
+printf("Enter the number of processes: ");
+scanf("%d",&n);
+printf("Enter the number of memory partitions: ");
+scanf("%d",&m);
+int mem[m], p[n];
+printf("Enter the memory partitions in order:\n ");
+for(int i=0;i<m;i++){
+    scanf("%d",&mem[i]);
+}
+printf("Enter the process space requirements in order:\n ");
+for(int i=0;i<n;i++){
+    scanf("%d",&p[i]);
+}
+int mem1[m],mem2[m],mem3[m];
+for(int i=0;i<m;i++){
+    mem1[i]=mem[i];
+    mem2[i]=mem[i];
+    mem3[i]=mem[i];
+}
+//first fit
+for(int i=0;i<m;i++){
+    for(int j=0;j<n;j++){
+        if(p[i]<mem1[j]){
+                flag=1;
+            printf("Process %d occupies %d and remaining space of %d is ",i+1,mem[j],mem[j]);
+            mem1[j]=mem1[j]-p[i];
+            printf("%d",mem1[j]);
+            break;
+        }
+    }
+    if(flag==0){
+        printf("No space available for %d ",p[i]);
+    }
+    flag=0;
+
+}
+//worst fit
+
+for(int i=0;i<m;i++){
+    int maxi=max(mem2);
+    for(int j=0;j<n;j++){
+        if(p[i]<maxi){
+                flag=1;
+            printf("Process %d occupies %d and remaining space of %d is ",i+1,mem2[j],mem2[j]);
+            mem2[j]=mem2[j]-p[i];
+            printf("%d",mem2[j]);
+            break;
+        }
+    }
+    if(flag==0){
+        printf("No space available for %d ",p[i]);
+    }
+    flag=0;
+
+}
+//best fit
+int sort[m];
+
+for(int i=0;i<m;i++){
+    sort[i]=mem3[i];
+}
+int temp;
+for(int i=0;i<m;i++){
+    for(int j=i+1;j<m;j++){
+        if(sort[i]>sort[j]){
+            temp=sort[i];
+            sort[i]=sort[j];
+            sort[j]=temp;
+        }
+    }
+}
+
+for(int i=0;i<m;i++){
+
+    for(int j=0;j<n;j++){
+        if(p[i]<sort[j]){
+                flag=1;
+            printf("Process %d occupies %d and remaining space of %d is ",i+1,mem2[j],mem2[j]);
+            mem2[j]=mem2[j]-p[i];
+            printf("%d",mem2[j]);
+            break;
+        }
+    }
+    if(flag==0){
+        printf("No space available for %d ",p[i]);
+    }
+    flag=0;
+
+}
+
+
+}
+*/
+#include <stdio.h>
+
+#define MAX 100
+
+int findWorstFit(int mem[], int m, int size) {
+    int index = -1;
+    for (int i = 0; i < m; i++) {
+        if (mem[i] >= size) {
+            if (index == -1 || mem[i] > mem[index]) {
+                index = i;
+            }
+        }
+    }
+    return index;
+}
+
+int findBestFit(int mem[], int m, int size) {
+    int index = -1;
+    for (int i = 0; i < m; i++) {
+        if (mem[i] >= size) {
+            if (index == -1 || mem[i] < mem[index]) {
+                index = i;
+            }
+        }
+    }
+    return index;
+}
+
+void firstFit(int mem[], int m, int p[], int n) {
+    int copy[MAX];
+    for (int i = 0; i < m; i++){
+        copy[i] = mem[i];
+    }
+
+    printf("\n First-Fit Allocation \n");
+    for (int i = 0; i < n; i++) {
+        int allocated = 0;
+        for (int j = 0; j < m; j++) {
+            if (copy[j] >= p[i]) {
+                printf("Process %d (%d KB) allocated to Partition %d (%d KB -> %d KB left)\n",i + 1, p[i], j + 1, mem[j], copy[j] - p[i]);
+                copy[j] -= p[i];
+                allocated = 1;
+                break;
+            }
+        }
+        if (!allocated)
+            printf("Process %d (%d KB) could not be allocated\n", i + 1, p[i]);
+    }
+}
+
+void worstFit(int mem[], int m, int p[], int n) {
+    int copy[MAX];
+    for (int i = 0; i < m; i++) copy[i] = mem[i];
+
+    printf("\n Worst-Fit Allocation \n");
+    for (int i = 0; i < n; i++) {
+        int idx = findWorstFit(copy, m, p[i]);
+        if (idx != -1) {
+            printf("Process %d (%d KB) allocated to Partition %d (%d KB -> %d KB left)\n",i + 1, p[i], idx + 1, mem[idx], copy[idx] - p[i]);
+            copy[idx] -= p[i];
+        } else {
+            printf("Process %d (%d KB) could not be allocated\n", i + 1, p[i]);
+        }
+    }
+}
+
+void bestFit(int mem[], int m, int p[], int n) {
+    int copy[MAX];
+    for (int i = 0; i < m; i++) copy[i] = mem[i];
+
+    printf("\n Best-Fit Allocation \n");
+    for (int i = 0; i < n; i++) {
+        int idx = findBestFit(copy, m, p[i]);
+        if (idx != -1) {
+            printf("Process %d (%d KB) allocated to Partition %d (%d KB -> %d KB left)\n",i + 1, p[i], idx + 1, mem[idx], copy[idx] - p[i]);
+            copy[idx] -= p[i];
+        } else {
+            printf("Process %d (%d KB) could not be allocated\n", i + 1, p[i]);
+        }
+    }
+}
+
+int main() {
+    int n, m;
+    int mem[MAX], p[MAX];
+
+    printf("Enter the number of memory partitions: ");
+    scanf("%d", &m);
+    printf("Enter the sizes of memory partitions (in KB):\n");
+    for (int i = 0; i < m; i++) {
+        printf("Partition %d: ", i + 1);
+        scanf("%d", &mem[i]);
+    }
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    printf("Enter the sizes of the processes (in KB):\n");
+    for (int i = 0; i < n; i++) {
+        printf("Process %d: ", i + 1);
+        scanf("%d", &p[i]);
+    }
+
+    firstFit(mem, m, p, n);
+    worstFit(mem, m, p, n);
+    bestFit(mem, m, p, n);
+
+    return 0;
+}
