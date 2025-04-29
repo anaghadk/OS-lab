@@ -1,0 +1,142 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+bool isInFrame(int frame[], int numFrames, int page) {
+    for (int i = 0; i < numFrames; i++) {
+        if (frame[i] == page) return true;
+    }
+    return false;
+}
+
+void printFrames(int frame[], int numFrames) {
+    for (int i = 0; i < numFrames; i++) {
+        if (frame[i] == -1)
+            printf("- ");
+        else
+            printf("%d ", frame[i]);
+    }
+    printf("\n");
+}
+
+void fifo(int ref[], int len, int numFrames) {
+    int frame[numFrames];
+    for (int i = 0; i < numFrames; i++) frame[i] = -1;
+
+    int pointer = 0, pageFaults = 0;
+
+    printf("FIFO Page Replacement Process:\n");
+    for (int i = 0; i < len; i++) {
+        if (!isInFrame(frame, numFrames, ref[i])) {
+            frame[pointer] = ref[i];
+            pointer = (pointer + 1) % numFrames;
+            pageFaults++;
+            printf("PF No. %d: ", pageFaults);
+            printFrames(frame, numFrames);
+        }
+    }
+    printf("FIFO Page Faults: %d\n\n", pageFaults);
+}
+
+void lru(int ref[], int len, int numFrames) {
+    int frame[numFrames];
+    int recent[numFrames];
+    for (int i = 0; i < numFrames; i++) {
+        frame[i] = -1;
+        recent[i] = -1;
+    }
+
+    int time = 0, pageFaults = 0;
+
+    printf("LRU Page Replacement Process:\n");
+    for (int i = 0; i < len; i++) {
+        bool found = false;
+        for (int j = 0; j < numFrames; j++) {
+            if (frame[j] == ref[i]) {
+                recent[j] = time++;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            int lruIndex = 0;
+            for (int j = 1; j < numFrames; j++) {
+                if (recent[j] < recent[lruIndex]) {
+                    lruIndex = j;
+                }
+            }
+            frame[lruIndex] = ref[i];
+            recent[lruIndex] = time++;
+            pageFaults++;
+            printf("PF No. %d: ", pageFaults);
+            printFrames(frame, numFrames);
+        }
+    }
+    printf("LRU Page Faults: %d\n\n", pageFaults);
+}
+
+int predict(int ref[], int frame[], int len, int numFrames, int index) {
+    int res = -1, farthest = index;
+    for (int i = 0; i < numFrames; i++) {
+        int j;
+        for (j = index; j < len; j++) {
+            if (frame[i] == ref[j]) {
+                if (j > farthest) {
+                    farthest = j;
+                    res = i;
+                }
+                break;
+            }
+        }
+        if (j == len) return i;
+    }
+    return (res == -1) ? 0 : res;
+}
+
+void optimal(int ref[], int len, int numFrames) {
+    int frame[numFrames];
+    for (int i = 0; i < numFrames; i++) frame[i] = -1;
+
+    int pageFaults = 0;
+
+    printf("Optimal Page Replacement Process:\n");
+    for (int i = 0; i < len; i++) {
+        if (!isInFrame(frame, numFrames, ref[i])) {
+            int index = -1;
+            for (int j = 0; j < numFrames; j++) {
+                if (frame[j] == -1) {
+                    index = j;
+                    break;
+                }
+            }
+
+            if (index == -1) {
+                index = predict(ref, frame, len, numFrames, i + 1);
+            }
+            frame[index] = ref[i];
+            pageFaults++;
+            printf("PF No. %d: ", pageFaults);
+            printFrames(frame, numFrames);
+        }
+    }
+    printf("Optimal Page Faults: %d\n", pageFaults);
+}
+
+int main() {
+    int numFrames, len;
+    printf("Enter the number of Frames: ");
+    scanf("%d", &numFrames);
+    printf("Enter the length of reference string: ");
+    scanf("%d", &len);
+    int ref[len];
+    printf("Enter the reference string: ");
+    for (int i = 0; i < len; i++) {
+        scanf("%d", &ref[i]);
+    }
+
+    printf("\n");
+    fifo(ref, len, numFrames);
+    lru(ref, len, numFrames);
+    optimal(ref, len, numFrames);
+
+    return 0;
+}
