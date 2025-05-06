@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define TOTAL_BLOCKS 20
+
+int memory[TOTAL_BLOCKS];
+
+void initializeMemory() {
+    for (int i = 0; i < TOTAL_BLOCKS; i++) {
+        memory[i] = 0;
+    }
+}
+
+bool allocateFile(int start, int length) {
+    if (start + length > TOTAL_BLOCKS) {
+        printf("Error: File exceeds memory limits.\n");
+        return false;
+    }
+
+    for (int i = start; i < start + length; i++) {
+        if (memory[i] == 1) {
+            printf("Error: Some blocks already allocated. Cannot allocate file.\n");
+            return false;
+        }
+    }
+
+    for (int i = start; i < start + length; i++) {
+        memory[i] = 1;
+    }
+
+    printf("File allocated from block %d to %d.\n", start, start + length - 1);
+    return true;
+}
+
+void displayMemory() {
+    printf("Memory Blocks: ");
+    for (int i = 0; i < TOTAL_BLOCKS; i++) {
+        printf("%d ", memory[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int choice, start, length;
+    initializeMemory();
+
+    while (1) {
+        printf("\n1. Allocate File\n2. Display Memory\n3. Exit\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter starting block and length of file: ");
+            scanf("%d %d", &start, &length);
+            allocateFile(start, length);
+            break;
+        case 2:
+            displayMemory();
+            break;
+        case 3:
+            exit(0);
+        default:
+            printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
+}
+
+
+
