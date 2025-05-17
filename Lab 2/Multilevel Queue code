@@ -1,5 +1,85 @@
 #include <stdio.h>
 
+typedef struct {
+    int process, bt, tat, wt;
+} multi;
+
+void main() {
+    int m, n;
+    float wtavg1 = 0, tatavg1 = 0, wtavg2 = 0, tatavg2 = 0;
+    
+    printf("Enter the number of system processes: ");
+    scanf("%d", &m);
+    multi q1[m];
+
+    printf("Enter the number of user processes: ");
+    scanf("%d", &n);
+    multi q2[n];
+
+    printf("Enter the System process no. and Burst times:\n");
+    for (int i = 0; i < m; i++) {
+        scanf("%d %d", &q1[i].process, &q1[i].bt);
+    }
+
+    printf("Enter the User process no. and Burst times:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d %d", &q2[i].process, &q2[i].bt);
+    }
+
+    // System Queue Scheduling
+    int current_time = 0;
+    for (int i = 0; i < m; i++) {
+        q1[i].wt = current_time;
+        q1[i].tat = q1[i].wt + q1[i].bt;
+        current_time += q1[i].bt;
+
+        wtavg1 += q1[i].wt;
+        tatavg1 += q1[i].tat;
+    }
+
+    // User Queue Scheduling (starts after system queue)
+    for (int i = 0; i < n; i++) {
+        q2[i].wt = current_time;
+        q2[i].tat = q2[i].wt + q2[i].bt;
+        current_time += q2[i].bt;
+
+        wtavg2 += q2[i].wt;
+        tatavg2 += q2[i].tat;
+    }
+
+    // Averages
+    float avg_wt_total = (wtavg1 + wtavg2) / (m + n);
+    float avg_tat_total = (tatavg1 + tatavg2) / (m + n);
+
+    // Output System Queue
+    printf("\n--- System Queue ---\n");
+    for (int i = 0; i < m; i++) {
+        printf("System Process: %d\tBT: %d\tWT: %d\tTAT: %d\n",
+            q1[i].process, q1[i].bt, q1[i].wt, q1[i].tat);
+    }
+
+    // Output User Queue
+    printf("\n--- User Queue ---\n");
+    for (int i = 0; i < n; i++) {
+        printf("User Process: %d\tBT: %d\tWT: %d\tTAT: %d\n",
+            q2[i].process, q2[i].bt, q2[i].wt, q2[i].tat);
+    }
+
+    printf("\nOverall Average Waiting Time: %.2f\n", avg_wt_total);
+    printf("Overall Average Turnaround Time: %.2f\n", avg_tat_total);
+}
+
+
+
+
+
+
+
+
+
+
+//#include <stdio.h>
+
 typedef struct multi {
     int process, bt, tat, wt;
 };
